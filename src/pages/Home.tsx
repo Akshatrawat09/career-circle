@@ -2,13 +2,13 @@
 import { useAuth } from '@/hooks/useAuth';
 import Header from '@/components/Header';
 import PostFeed from '@/components/PostFeed';
-import AuthForm from '@/components/AuthForm';
+import LandingPage from '@/components/LandingPage';
 
 const Home = () => {
   const { user } = useAuth();
 
   if (!user) {
-    return <AuthForm />;
+    return <LandingPage />;
   }
 
   return (
