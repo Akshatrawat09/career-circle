@@ -1,18 +1,9 @@
-# Welcome to your Lovable project
+# Welcome to   Career Circle
 
 ## Project info
 
-**URL**: https://lovable.dev/projects/69448910-7e19-492d-8268-412827a26029
+**URL**: https://career-circle.lovable.app/
 
-## How can I edit this code?
-
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/69448910-7e19-492d-8268-412827a26029) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
 
 **Use your preferred IDE**
 
