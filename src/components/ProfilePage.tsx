@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -12,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
 import PostCard from './PostCard';
-import { Edit, Save, X } from 'lucide-react';
+import { Edit, Save, X, User, FileText, Calendar, Loader2 } from 'lucide-react';
 
 interface Profile {
   id: string;
@@ -49,7 +48,7 @@ const ProfilePage = () => {
         .single();
 
       if (error) throw error;
-      return data as Profile;
+      return data as any;
     },
     enabled: !!userId,
   });
@@ -72,7 +71,7 @@ const ProfilePage = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data as Post[];
+      return data as any;
     },
     enabled: !!userId,
   });
@@ -104,7 +103,7 @@ const ProfilePage = () => {
       setIsEditing(false);
       refetchProfile();
       toast({
-        title: 'Profile updated!',
+        title: '✅ Profile updated!',
         description: 'Your profile has been updated successfully.',
       });
     }
@@ -116,16 +115,11 @@ const ProfilePage = () => {
 
   if (profileLoading) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-6">
-        <div className="animate-pulse">
-          <div className="bg-white rounded-lg border p-6 mb-6">
-            <div className="flex items-center space-x-4 mb-4">
-              <div className="w-20 h-20 bg-gray-200 rounded-full"></div>
-              <div>
-                <div className="w-32 h-6 bg-gray-200 rounded mb-2"></div>
-                <div className="w-48 h-4 bg-gray-200 rounded"></div>
-              </div>
-            </div>
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <div className="flex items-center justify-center py-12">
+          <div className="text-center">
+            <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-4" />
+            <p className="text-gray-500">Loading profile...</p>
           </div>
         </div>
       </div>
@@ -134,23 +128,32 @@ const ProfilePage = () => {
 
   if (!profile) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-6">
-        <div className="text-center text-red-600">Profile not found.</div>
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <div className="text-center bg-red-50 border border-red-200 rounded-xl p-8">
+          <div className="text-red-600 font-medium">Profile not found</div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6">
-      <Card className="mb-6">
-        <CardHeader>
+    <div className="max-w-4xl mx-auto px-4 py-8">
+      <Card className="mb-8 border-0 shadow-xl bg-white/90 backdrop-blur-md">
+        <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-lg">
           <div className="flex justify-between items-start">
-            <CardTitle>Profile</CardTitle>
+            <CardTitle className="flex items-center text-xl">
+              <User className="w-6 h-6 mr-2" />
+              Professional Profile
+            </CardTitle>
             {isOwnProfile && (
               <div className="flex space-x-2">
                 {isEditing ? (
                   <>
-                    <Button size="sm" onClick={handleSaveProfile}>
+                    <Button 
+                      size="sm" 
+                      onClick={handleSaveProfile}
+                      className="bg-white/20 hover:bg-white/30 text-white border border-white/30"
+                    >
                       <Save className="w-4 h-4 mr-1" />
                       Save
                     </Button>
@@ -161,59 +164,78 @@ const ProfilePage = () => {
                         setIsEditing(false);
                         setEditForm({ name: profile.name, bio: profile.bio || '' });
                       }}
+                      className="bg-white/20 hover:bg-white/30 text-white border border-white/30"
                     >
                       <X className="w-4 h-4 mr-1" />
                       Cancel
                     </Button>
                   </>
                 ) : (
-                  <Button size="sm" variant="outline" onClick={() => setIsEditing(true)}>
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    onClick={() => setIsEditing(true)}
+                    className="bg-white/20 hover:bg-white/30 text-white border border-white/30"
+                  >
                     <Edit className="w-4 h-4 mr-1" />
-                    Edit
+                    Edit Profile
                   </Button>
                 )}
               </div>
             )}
           </div>
         </CardHeader>
-        <CardContent>
-          <div className="flex items-center space-x-4 mb-6">
-            <Avatar className="w-20 h-20">
-              <AvatarFallback className="text-2xl">
+        <CardContent className="p-8">
+          <div className="flex items-start space-x-6 mb-8">
+            <Avatar className="w-24 h-24 border-4 border-gray-200 shadow-lg">
+              <AvatarFallback className="text-2xl bg-gradient-to-br from-blue-500 to-indigo-500 text-white">
                 {getInitials(profile.name)}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1">
               {isEditing ? (
-                <div className="space-y-4">
+                <div className="space-y-6">
                   <div>
-                    <Label htmlFor="name">Name</Label>
+                    <Label htmlFor="name" className="text-gray-700 font-medium">Full Name</Label>
                     <Input
                       id="name"
                       value={editForm.name}
                       onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                      className="mt-2 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="bio">Bio</Label>
+                    <Label htmlFor="bio" className="text-gray-700 font-medium">Professional Bio</Label>
                     <Textarea
                       id="bio"
                       value={editForm.bio}
                       onChange={(e) => setEditForm({ ...editForm, bio: e.target.value })}
-                      placeholder="Tell us about yourself..."
-                      rows={3}
+                      placeholder="Share your professional background, expertise, and aspirations..."
+                      rows={4}
+                      className="mt-2 border-gray-200 focus:border-blue-500 focus:ring-blue-500 resize-none"
                     />
                   </div>
                 </div>
               ) : (
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900">{profile.name}</h1>
-                  {profile.bio && (
-                    <p className="text-gray-600 mt-2">{profile.bio}</p>
+                  <h1 className="text-3xl font-bold text-gray-900 mb-3">{profile.name}</h1>
+                  {profile.bio ? (
+                    <p className="text-gray-600 leading-relaxed text-lg">{profile.bio}</p>
+                  ) : (
+                    <div className="text-gray-400 italic">
+                      {isOwnProfile ? 
+                        "Add a professional bio to tell others about your expertise and background" :
+                        "No bio available"
+                      }
+                    </div>
                   )}
-                  {!profile.bio && isOwnProfile && (
-                    <p className="text-gray-400 mt-2 italic">Add a bio to tell others about yourself</p>
-                  )}
+                  <div className="flex items-center text-sm text-gray-500 mt-4">
+                    <Calendar className="w-4 h-4 mr-1" />
+                    Member since {new Date(profile.created_at).toLocaleDateString('en-US', { 
+                      month: 'long', 
+                      year: 'numeric' 
+                    })}
+                  </div>
                 </div>
               )}
             </div>
@@ -221,41 +243,44 @@ const ProfilePage = () => {
         </CardContent>
       </Card>
 
-      <div>
-        <h2 className="text-xl font-bold text-gray-900 mb-4">
-          Posts {posts && `(${posts.length})`}
-        </h2>
-        
-        {postsLoading ? (
-          <div className="space-y-4">
-            {[...Array(2)].map((_, i) => (
-              <div key={i} className="bg-white rounded-lg border p-6 animate-pulse">
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
-                  <div>
-                    <div className="w-24 h-4 bg-gray-200 rounded mb-1"></div>
-                    <div className="w-16 h-3 bg-gray-200 rounded"></div>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <div className="w-full h-4 bg-gray-200 rounded"></div>
-                  <div className="w-3/4 h-4 bg-gray-200 rounded"></div>
-                </div>
+      <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="flex items-center text-xl text-gray-900">
+            <FileText className="w-5 h-5 mr-2" />
+            Posts & Insights
+            {posts && (
+              <span className="ml-2 px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">
+                {posts.length}
+              </span>
+            )}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {postsLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="text-center">
+                <Loader2 className="w-6 h-6 animate-spin text-blue-600 mx-auto mb-2" />
+                <p className="text-gray-500 text-sm">Loading posts...</p>
               </div>
-            ))}
-          </div>
-        ) : posts && posts.length === 0 ? (
-          <div className="text-center text-gray-500 py-8">
-            {isOwnProfile ? "You haven't posted anything yet." : "No posts yet."}
-          </div>
-        ) : (
-          <div>
-            {posts?.map((post) => (
-              <PostCard key={post.id} post={post} />
-            ))}
-          </div>
-        )}
-      </div>
+            </div>
+          ) : posts && posts.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                <FileText className="w-8 h-8 text-gray-400" />
+              </div>
+              <p className="text-gray-500">
+                {isOwnProfile ? "You haven't shared any insights yet." : "No posts shared yet."}
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {posts?.map((post) => (
+                <PostCard key={post.id} post={post} />
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };
